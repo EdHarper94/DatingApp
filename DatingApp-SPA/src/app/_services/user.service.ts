@@ -87,12 +87,12 @@ export class UserService {
       params = params.append('pageSize', itemsPerPage);
     }
 
-    return this.http.get(this.baseUrl + 'users/' + id + '/messages/', {observe: 'response', params})
+    return this.http.get<Message[]>(this.baseUrl + 'users/' + id + '/messages/', {observe: 'response', params})
     .pipe(
       map(response => {
         paginatedResult.result = response.body;
         if (response.headers.get('Pagination') != null) {
-          paginatedResult.pagination = JSON.parse(response.headers.get('Paginiation'));
+          paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
         }
 
         return paginatedResult;
@@ -100,5 +100,20 @@ export class UserService {
     );
   }
 
+  getMessageThread(id: number, recipientId: number) {
+    return this.http.get<Message[]>(this.baseUrl + 'users/' + id + '/messages/thread/' + recipientId);
+  }
+
+  sendMessage(id: number, message: Message) {
+    return this.http.post(this.baseUrl + 'users/' + id + '/messages', message);
+  }
+
+  deleteMessage(id: number, userId: number) {
+    return this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + id, {});
+  }
+
+  markAsRead(userId: number, messageId: number) {
+    this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + messageId + '/read', {})
+    .subscribe();
+  }
 }
-// test
